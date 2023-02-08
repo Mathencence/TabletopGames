@@ -3,8 +3,10 @@ package games.jaipurskeleton.actions;
 import core.AbstractGameState;
 import core.actions.AbstractAction;
 import core.components.Component;
+import core.components.Deck;
 import games.jaipurskeleton.JaipurGameState;
 import games.jaipurskeleton.components.JaipurCard;
+import games.jaipurskeleton.components.JaipurToken;
 
 import java.util.Objects;
 
@@ -45,6 +47,35 @@ public class SellCards extends AbstractAction {
         int currentPlayer = gs.getCurrentPlayer();
 
         // TODO: Follow lab 1 instructions (Section 3.1) to fill in this method here.
+        jgs.getPlayerHands().get(currentPlayer).get(goodType).decrement(howMany);
+
+        Deck<JaipurToken> goodTokens = jgs.getGoodTokens().get(goodType) ;
+        boolean empty = goodTokens.getSize() == 0; //If the goodTokens.size equals to 0, empty = true.
+        if(!empty){
+            for(int i = 0; i < howMany; i++){
+                if(goodTokens.getSize() > 0){
+                    JaipurToken token = goodTokens.draw();
+                    jgs.getPlayerScores().get(currentPlayer).increment(token.tokenValue);
+                    jgs.getPlayerNGoodTokens().get(currentPlayer).increment(); //Add 1 to the player's goodToken pile.
+                }
+            }
+        }
+        if(!empty && goodTokens.getSize()==0){ //Not empty before but depleted by this action
+            ((JaipurGameState)gs).getnGoodTokensSold().increment(); //Number of depleted pile increase by 1
+        }
+
+        if(jgs.getBonusTokens().containsKey(howMany)){
+            Deck<JaipurToken> bonusTokens;//The pile of the specific bonusToken
+            for (int i = 0; i<howMany;i++){
+                //Using the for loop to retry getting a lower bonus token if the original bonusToken pile is depleted.
+                bonusTokens = jgs.getBonusTokens().get(howMany-i);
+                if(bonusTokens.getSize()>0){
+                    JaipurToken token = bonusTokens.draw();
+                    jgs.getPlayerScores().get(currentPlayer).increment(token.tokenValue);
+                    jgs.getPlayerNBonusTokens().get(currentPlayer).increment();
+                }
+            }
+        }
 
         return true;
     }
