@@ -141,12 +141,43 @@ public class JaipurGameState extends AbstractGameState {
             // TODO: Count how many cards each player has in their hands in total.
             // TODO: Add new JaipurCard objects of the corresponding type to the *copy draw deck*, as many as the player has in their hand.
             // TODO: After going through all the players, shuffle the *copy draw deck*.
+            int hands[] = new int[getNPlayers()];
+            for (int i = 0; i < getNPlayers(); i++) {
+                hands[i] =0;
+                if(i!=playerId) {
 
+                    for (JaipurCard.GoodType gt : playerHands.get(i).keySet()) {
+                        hands[i] += playerHands.get(i).get(gt).getValueIdx();
+                        copy.drawDeck.add(new JaipurCard(gt), playerHands.get(i).get(gt).getValueIdx());
+                        copy.playerHands.get(i).get(gt).setValue(0);
+                    }
+                }
+            }
+            copy.drawDeck.shuffle(r);
             // Then draw new cards for opponent
             // TODO: Iterate through the players. If they're the `playerId` observing the state (passed as argument to this method), copy the exact hand of the player into the *copy game state*
             // TODO: Otherwise, draw new cards from the *copy draw deck* and update the *copy player hand* appropriately (you can check this same functionality in the round setup performed in the Forward Model for help)
             // TODO: Make sure to ignore camels, and put them back at the bottom of the *copy draw deck*, e.g. copy.drawDeck.add(card,copy.drawDeck.getSize()); Camels don't stay in player's hands, so we're only filling hands with non-camel cards
             // TODO: At the end of this process, reshuffle the *copy draw deck* to make sure any camels that were drawn and put back are randomly distributed too
+            for (int i = 0; i < getNPlayers(); i++) {
+                if(i!=playerId) {
+                    for (int j = 0;j<hands[i];j++) {
+                        JaipurCard card = copy.drawDeck.draw();
+                        while(card.goodType == JaipurCard.GoodType.Camel){
+                            copy.drawDeck.add(card,copy.drawDeck.getSize());
+                            card = copy.drawDeck.draw();
+                        }
+                        copy.playerHands.get(i).get(card.goodType).increment();
+                    }
+                }else{
+                    for (JaipurCard.GoodType gt: playerHands.get(i).keySet()) {
+                        if(playerHands.get(i).get(gt).getValueIdx()>0)
+                        copy.playerHands.get(i).get(gt).increment(playerHands.get(i).get(gt).getValueIdx());
+                    }
+
+                }
+            }
+            copy.drawDeck.shuffle(r);
         }
         return copy;
     }
