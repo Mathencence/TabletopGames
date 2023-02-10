@@ -3,10 +3,13 @@ package games.jaipurskeleton.actions;
 import com.google.common.collect.ImmutableMap;
 import core.AbstractGameState;
 import core.actions.AbstractAction;
+import core.components.Counter;
 import core.interfaces.IExtendedSequence;
 import games.jaipurskeleton.JaipurGameState;
 import games.jaipurskeleton.components.JaipurCard;
+import games.jaipurskeleton.components.JaipurToken;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class TakeCards extends AbstractAction {
@@ -38,7 +41,6 @@ public class TakeCards extends AbstractAction {
     @Override
     public boolean execute(AbstractGameState gs) {
         JaipurGameState jgs = (JaipurGameState) gs;
-
         if (howManyPerTypeTakeFromMarket.size() == 1) {
             JaipurCard.GoodType goodType = howManyPerTypeTakeFromMarket.keySet().iterator().next();
             int howMany = howManyPerTypeTakeFromMarket.get(goodType);
@@ -46,20 +48,36 @@ public class TakeCards extends AbstractAction {
                 // Option C: Take ALL the camels.
 
                 // TODO 1: Increment player herds by the number of camels in the market
+                int amountInMarket = jgs.getMarket().get(goodType).getValueIdx();
+                jgs.getPlayerHerds().get(playerID).increment(amountInMarket);
                 // TODO 1: Remove all camels from the market
+                jgs.getMarket().get(goodType).decrement(amountInMarket);
                 // TODO 1: Refill market with cards from the draw deck, to recquried market size
+                JaipurCard card;
+                for(int i =0;i<amountInMarket;i++) {
+                    card = jgs.getDrawDeck().draw();
+                    if(card==null){
+                        triggerRoundEnd = true;
+                    }else{
+                        jgs.getMarket().get(card.goodType).increment();
+                    }
+                }
                 // TODO 1: If the draw deck becomes empty when trying to draw a new card, set `triggerRoundEnd` boolean flag to true
-
                 return true;
-
             } else if (howMany == 1) {
                 // Option B: Take 1 single good
-
                 // TODO 2: Increment the number of cards the player has of this type (`goodType`) by 1
+                jgs.getPlayerHands().get(playerID).get(goodType).increment();
                 // TODO 2: Reduce the number of cards in the market of this type by 1
+                jgs.getMarket().get(goodType).decrement();
                 // TODO 2: Draw a new card from the draw deck (jgs.getDrawDeck().draw()) and increment the corresponding type in the market by 1
                 // TODO 2: If the draw deck becomes empty when trying to draw a new card, set `triggerRoundEnd` boolean flag to true
-
+                JaipurCard card = jgs.getDrawDeck().draw();
+                if(card==null){
+                    triggerRoundEnd = true;
+                }else{
+                    jgs.getMarket().get(card.goodType).increment();
+                }
                 return true;
             }
         }

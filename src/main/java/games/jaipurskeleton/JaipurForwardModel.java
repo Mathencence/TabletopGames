@@ -6,6 +6,7 @@ import core.StandardForwardModel;
 import core.actions.AbstractAction;
 import core.components.Counter;
 import core.components.Deck;
+import com.google.common.collect.ImmutableMap;
 import games.jaipurskeleton.actions.SellCards;
 import games.jaipurskeleton.actions.TakeCards;
 import games.jaipurskeleton.components.JaipurCard;
@@ -19,6 +20,7 @@ import static games.jaipurskeleton.components.JaipurCard.GoodType.*;
 /**
  * Jaipur rules: <a href="https://www.fgbradleys.com/rules/rules2/Jaipur-rules.pdf">pdf here</a>
  */
+
 public class JaipurForwardModel extends StandardForwardModel {
 
     /**
@@ -32,6 +34,45 @@ public class JaipurForwardModel extends StandardForwardModel {
      *
      * @param firstState - the state to be modified to the initial game state.
      */
+    public static void pickCards(JaipurCard.GoodType[] cardAvailable, JaipurCard.GoodType[][] cardsToPick, int n){
+        // if cardAvailable array is empty, return
+        if(cardAvailable.length == 0)
+            return;
+
+        // if n is greater than cardAvailable array size, reset n to max possible
+        if(n > cardAvailable.length)
+            n = cardAvailable.length;
+
+        // iterate over all possible combinations
+        for(int i=0; i<Math.pow(2, cardAvailable.length); i++){
+            // reset cardsToPick array
+            for(int j=0; j<cardsToPick.length; j++){
+                for(int k=0; k<cardsToPick[j].length; k++){
+                    cardsToPick[j][k] = null;
+                }
+            }
+
+            // create variables to keep track of number of cards picked and index of cardAvailable array
+            int count = 0;
+            int index = 0;
+
+            // iterate over bits of number
+            for(int k=i; k>0; k >>= 1){
+                // if the bit is 1, pick the card at index from cardAvailable array
+                if((k&1) == 1){
+                    cardsToPick[count][index] = cardAvailable[index];
+                    count++;
+                }
+
+                // if count is equal to n, break the loop
+                if(count == n)
+                    break;
+
+                //increment index
+                index++;
+            }
+        }
+    }
     @Override
     protected void _setup(AbstractGameState firstState) {
         JaipurGameState gs = (JaipurGameState) firstState;
@@ -260,7 +301,11 @@ public class JaipurForwardModel extends StandardForwardModel {
         // Can take cards from the market, respecting hand limit
         // Option C: Take all camels, they don't count towards hand limit
         // TODO 1: Check how many camel cards are in the market. If more than 0, construct one TakeCards action object and add it to the `actions` ArrayList. (The `howManyPerTypeGiveFromHand` argument should be null)
-
+        if(jgs.getMarket().get(JaipurCard.GoodType.Camel).getValueIdx()>0)
+        {
+            ImmutableMap<JaipurCard.GoodType, Integer> camelMap = ImmutableMap.of(JaipurCard.GoodType.Camel, 1);
+            actions.add(new TakeCards(camelMap,null,currentPlayer));
+        }
         int nCardsInHand = 0;
         for (JaipurCard.GoodType gt: playerHand.keySet()) {
             nCardsInHand += playerHand.get(gt).getValue();
@@ -270,14 +315,32 @@ public class JaipurForwardModel extends StandardForwardModel {
         if (nCardsInHand < 7) {
             // Option B: Take a single (non-camel) card from the market
             // TODO 2: For each good type in the market, if there is at least 1 of that type (which is not a Camel), construct one TakeCards action object to take 1 of that type from the market, and add it to the `actions` ArrayList. (The `howManyPerTypeGiveFromHand` argument should be null)
+            for(JaipurCard.GoodType gt: jgs.getMarket().keySet()){
+                if(jgs.getMarket().get(gt).getValueIdx()>0&&gt!=JaipurCard.GoodType.Camel){
+                    ImmutableMap<JaipurCard.GoodType, Integer> itemMap = ImmutableMap.of(gt, 1);
+                    actions.add(new TakeCards(itemMap,null,currentPlayer));
+                }
+            }
         }
 
         // Option A: Take several (non-camel) cards and replenish with cards of different types from hand (or with camels)
         // TODO (Advanced, bonus, optional): Calculate legal option A variations
-
+        /*
+        JaipurCard.GoodType cardAvailable[] = {null,null,null,null,null}; int counter =0;
+        for(JaipurCard.GoodType gt: jgs.getMarket().keySet()) {
+            if(jgs.getMarket().get(gt).getValueIdx()>0&&gt!=JaipurCard.GoodType.Camel) {
+                for (int i =0;i<jgs.getMarket().get(gt).getValueIdx();i++){
+                    cardAvailable[counter] = gt;
+                    counter++;
+                }
+            }
+        }
+        for(int nCardsToTake = 2;nCardsToTake<=5 && nCardsToTake<=7-nCardsInHand;nCardsToTake++){
+            JaipurCard.GoodType cardsToTake[][] = new JaipurCard.GoodType[(int)Math.pow(2,counter)][nCardsToTake];
+            pickCards(cardAvailable,cardsToTake,nCardsToTake);
+        }*/
         return actions;
     }
-
     @Override
     protected void _afterAction(AbstractGameState currentState, AbstractAction actionTaken) {
         if (currentState.isActionInProgress()) return;

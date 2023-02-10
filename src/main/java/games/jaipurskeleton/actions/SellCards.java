@@ -63,19 +63,20 @@ public class SellCards extends AbstractAction {
         if(!empty && goodTokens.getSize()==0){ //Not empty before but depleted by this action
             ((JaipurGameState)gs).getnGoodTokensSold().increment(); //Number of depleted pile increase by 1
         }
-
-        if(jgs.getBonusTokens().containsKey(howMany)){
-            Deck<JaipurToken> bonusTokens;//The pile of the specific bonusToken
-            for (int i = 0; i<howMany;i++){
+        Deck<JaipurToken> bonusTokens;//The pile of the specific bonusToken
+        for (int i = 0; i<howMany;i++){
+            if(jgs.getBonusTokens().containsKey(howMany - i)) {
                 //Using the for loop to retry getting a lower bonus token if the original bonusToken pile is depleted.
-                bonusTokens = jgs.getBonusTokens().get(howMany-i);
-                if(bonusTokens.getSize()>0){
+                bonusTokens = jgs.getBonusTokens().get(howMany - i);
+                if (bonusTokens.getSize() > 0) {
                     JaipurToken token = bonusTokens.draw();
                     jgs.getPlayerScores().get(currentPlayer).increment(token.tokenValue);
                     jgs.getPlayerNBonusTokens().get(currentPlayer).increment();
+                    break;
                 }
             }
         }
+
 
         return true;
     }
