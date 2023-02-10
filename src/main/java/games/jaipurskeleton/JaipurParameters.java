@@ -37,6 +37,7 @@ public class JaipurParameters extends AbstractParameters {
     int nPointsMostCamels = 5;
     int nGoodTokensEmptyRoundEnd = 3;
 
+    int nRoundsWinForGameWin = 2;
     public JaipurParameters(long seed) {
         super(seed);
     }
@@ -80,11 +81,10 @@ public class JaipurParameters extends AbstractParameters {
         if (!(o instanceof JaipurParameters)) return false;
         if (!super.equals(o)) return false;
         JaipurParameters that = (JaipurParameters) o;
-        return nPointsMostCamels == that.nPointsMostCamels && nGoodTokensEmptyRoundEnd == that.nGoodTokensEmptyRoundEnd && Objects.equals(goodNCardsMinimumSell, that.goodNCardsMinimumSell) && Objects.equals(bonusTokensAvailable, that.bonusTokensAvailable);
+        return nPointsMostCamels == that.nPointsMostCamels && nGoodTokensEmptyRoundEnd == that.nGoodTokensEmptyRoundEnd && nRoundsWinForGameWin == that.nRoundsWinForGameWin && Objects.equals(goodNCardsMinimumSell, that.goodNCardsMinimumSell) && Objects.equals(bonusTokensAvailable, that.bonusTokensAvailable);
     }
-
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), goodNCardsMinimumSell, bonusTokensAvailable, nPointsMostCamels, nGoodTokensEmptyRoundEnd);
+        return Objects.hash(super.hashCode(), goodNCardsMinimumSell, bonusTokensAvailable, nPointsMostCamels, nGoodTokensEmptyRoundEnd, nRoundsWinForGameWin);
     }
 }
