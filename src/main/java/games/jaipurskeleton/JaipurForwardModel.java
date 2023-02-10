@@ -127,7 +127,7 @@ public class JaipurForwardModel extends StandardForwardModel {
         // Place 3 camel cards in the market
         for (JaipurCard.GoodType gt: JaipurCard.GoodType.values()) {
             if (gt == JaipurCard.GoodType.Camel) {
-                gs.market.get(gt).setValue(3);
+                gs.market.get(gt).setValue(jp.nInitialCamelInMarket);
             } else {
                 gs.market.get(gt).setValue(0);
             }
@@ -135,31 +135,31 @@ public class JaipurForwardModel extends StandardForwardModel {
 
         // Create deck of cards
         gs.drawDeck.clear();
-        for (int i = 0; i < 6; i++) {  // 6 Diamond cards
+        for (int i = 0; i < jp.nInitialDiamond; i++) {  // 6 Diamond cards
             JaipurCard card = new JaipurCard(Diamonds);
             gs.drawDeck.add(card);
         }
-        for (int i = 0; i < 6; i++) {  // 6 Gold cards
+        for (int i = 0; i < jp.nInitialGold; i++) {  // 6 Gold cards
             JaipurCard card = new JaipurCard(Gold);
             gs.drawDeck.add(card);
         }
-        for (int i = 0; i < 6; i++) {  // 6 Silver cards
+        for (int i = 0; i < jp.nInitialSilver; i++) {  // 6 Silver cards
             JaipurCard card = new JaipurCard(Silver);
             gs.drawDeck.add(card);
         }
-        for (int i = 0; i < 8; i++) {  // 8 Cloth cards
+        for (int i = 0; i < jp.nInitialCloth; i++) {  // 8 Cloth cards
             JaipurCard card = new JaipurCard(JaipurCard.GoodType.Cloth);
             gs.drawDeck.add(card);
         }
-        for (int i = 0; i < 8; i++) {  // 8 Spice cards
+        for (int i = 0; i < jp.nInitialSpice; i++) {  // 8 Spice cards
             JaipurCard card = new JaipurCard(JaipurCard.GoodType.Spice);
             gs.drawDeck.add(card);
         }
-        for (int i = 0; i < 10; i++) {  // 10 Leather cards
+        for (int i = 0; i < jp.nInitialLeather; i++) {  // 10 Leather cards
             JaipurCard card = new JaipurCard(JaipurCard.GoodType.Leather);
             gs.drawDeck.add(card);
         }
-        for (int i = 0; i < 8; i++) {  // 11 Camel cards, - 3 already in the market
+        for (int i = 0; i < (jp.nInitialCamel - jp.nInitialCamelInMarket); i++) {  // 11 Camel cards, - 3 already in the market
             JaipurCard card = new JaipurCard(JaipurCard.GoodType.Camel);
             gs.drawDeck.add(card);
         }

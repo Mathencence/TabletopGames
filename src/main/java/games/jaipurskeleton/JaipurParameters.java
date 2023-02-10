@@ -44,8 +44,16 @@ public class JaipurParameters extends AbstractParameters {
     }};
     int nPointsMostCamels = 5;
     int nGoodTokensEmptyRoundEnd = 3;
-
     int nRoundsWinForGameWin = 2;
+    int nInitialDiamond = 6;
+    int nInitialGold = 6;
+    int nInitialSilver = 6;
+    int nInitialCloth = 8;
+    int nInitialSpice = 8;
+    int nInitialLeather =10;
+    int nInitialCamel=11;
+    int nInitialCamelInMarket=3;
+
     public JaipurParameters(long seed) {
         super(seed);
     }
@@ -65,6 +73,14 @@ public class JaipurParameters extends AbstractParameters {
         this.nPointsMostCamels = jaipurParameters.getNPointsMostCamels();
         this.nGoodTokensEmptyRoundEnd = jaipurParameters.getNGoodTokensEmptyGameEnd();
         this.nRoundsWinForGameWin = jaipurParameters.getnRoundsWinForGameWin();
+        this.nInitialDiamond = jaipurParameters.getnInitialDiamond();
+        this.nInitialGold = jaipurParameters.getnInitialGold();
+        this.nInitialSilver = jaipurParameters.getnInitialSilver();
+        this.nInitialCloth = jaipurParameters.getnInitialCloth();
+        this.nInitialSpice = jaipurParameters.getnInitialSpice();
+        this.nInitialLeather = jaipurParameters.getnInitialLeather();
+        this.nInitialCamel = jaipurParameters.getnInitialCamel();
+        this.nInitialCamelInMarket = jaipurParameters.getnInitialCamelInMarket();
     }
 
     public Map<JaipurCard.GoodType, Integer> getGoodNCardsMinimumSell() {
@@ -77,6 +93,38 @@ public class JaipurParameters extends AbstractParameters {
 
     public Map<JaipurCard.GoodType, Integer[]> getGoodTokensProgression() {
         return goodTokensProgression;
+    }
+
+    public int getnInitialDiamond() {
+        return nInitialDiamond;
+    }
+
+    public int getnInitialGold() {
+        return nInitialGold;
+    }
+
+    public int getnInitialSilver() {
+        return nInitialSilver;
+    }
+
+    public int getnInitialCloth() {
+        return nInitialCloth;
+    }
+
+    public int getnInitialSpice() {
+        return nInitialSpice;
+    }
+
+    public int getnInitialLeather() {
+        return nInitialLeather;
+    }
+
+    public int getnInitialCamel() {
+        return nInitialCamel;
+    }
+
+    public int getnInitialCamelInMarket() {
+        return nInitialCamelInMarket;
     }
 
     public int getNPointsMostCamels() {
@@ -102,10 +150,10 @@ public class JaipurParameters extends AbstractParameters {
         if (!(o instanceof JaipurParameters)) return false;
         if (!super.equals(o)) return false;
         JaipurParameters that = (JaipurParameters) o;
-        return nPointsMostCamels == that.nPointsMostCamels && nGoodTokensEmptyRoundEnd == that.nGoodTokensEmptyRoundEnd && nRoundsWinForGameWin == that.nRoundsWinForGameWin && Objects.equals(goodNCardsMinimumSell, that.goodNCardsMinimumSell) && Objects.equals(bonusTokensAvailable, that.bonusTokensAvailable)&& Objects.equals(goodTokensProgression,that.goodTokensProgression);
+        return nPointsMostCamels == that.nPointsMostCamels && nGoodTokensEmptyRoundEnd == that.nGoodTokensEmptyRoundEnd && nRoundsWinForGameWin == that.nRoundsWinForGameWin && nInitialDiamond == that.nInitialDiamond && nInitialGold == that.nInitialGold && nInitialSilver == that.nInitialSilver && nInitialCloth == that.nInitialCloth && nInitialSpice == that.nInitialSpice && nInitialLeather == that.nInitialLeather && nInitialCamel == that.nInitialCamel && nInitialCamelInMarket == that.nInitialCamelInMarket && goodNCardsMinimumSell.equals(that.goodNCardsMinimumSell) && bonusTokensAvailable.equals(that.bonusTokensAvailable) && goodTokensProgression.equals(that.goodTokensProgression);
     }
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), goodNCardsMinimumSell, bonusTokensAvailable,goodTokensProgression, nPointsMostCamels, nGoodTokensEmptyRoundEnd, nRoundsWinForGameWin);
+        return Objects.hash(super.hashCode(), goodNCardsMinimumSell, bonusTokensAvailable, goodTokensProgression, nPointsMostCamels, nGoodTokensEmptyRoundEnd, nRoundsWinForGameWin, nInitialDiamond, nInitialGold, nInitialSilver, nInitialCloth, nInitialSpice, nInitialLeather, nInitialCamel, nInitialCamelInMarket);
     }
 }
