@@ -11,7 +11,7 @@ import games.jaipurskeleton.actions.SellCards;
 import games.jaipurskeleton.actions.TakeCards;
 import games.jaipurskeleton.components.JaipurCard;
 import games.jaipurskeleton.components.JaipurToken;
-
+import utilities.Utils;
 import java.util.*;
 
 import static core.CoreConstants.GameResult.*;
@@ -23,6 +23,43 @@ import static games.jaipurskeleton.components.JaipurCard.GoodType.*;
 
 public class JaipurForwardModel extends StandardForwardModel {
 
+    public JaipurCard.GoodType intToGoodtype(int value){
+        JaipurCard.GoodType gt;
+        switch (value) {
+            /*Diamonds,
+        Gold,
+        Silver,
+        Cloth,
+        Spice,
+        Leather,
+        Camel*/
+            case 0:
+                gt = Diamonds;
+                break;
+            case 1:
+                gt = Gold;
+                break;
+            case 2:
+                gt =  Silver;
+                break;
+            case 3:
+                gt = Cloth;
+                break;
+            case 4:
+                gt = Spice;
+                break;
+            case 5:
+                gt = Leather;
+                break;
+            case 6:
+                gt = Camel;
+                break;
+            default:
+                gt = null;
+                break;
+        }
+        return gt;
+    }
     /**
      * Initializes all variables in the given game state. Performs initial game setup according to game rules, e.g.:
      * <ul>
@@ -34,45 +71,7 @@ public class JaipurForwardModel extends StandardForwardModel {
      *
      * @param firstState - the state to be modified to the initial game state.
      */
-    public static void pickCards(JaipurCard.GoodType[] cardAvailable, JaipurCard.GoodType[][] cardsToPick, int n){
-        // if cardAvailable array is empty, return
-        if(cardAvailable.length == 0)
-            return;
 
-        // if n is greater than cardAvailable array size, reset n to max possible
-        if(n > cardAvailable.length)
-            n = cardAvailable.length;
-
-        // iterate over all possible combinations
-        for(int i=0; i<Math.pow(2, cardAvailable.length); i++){
-            // reset cardsToPick array
-            for(int j=0; j<cardsToPick.length; j++){
-                for(int k=0; k<cardsToPick[j].length; k++){
-                    cardsToPick[j][k] = null;
-                }
-            }
-
-            // create variables to keep track of number of cards picked and index of cardAvailable array
-            int count = 0;
-            int index = 0;
-
-            // iterate over bits of number
-            for(int k=i; k>0; k >>= 1){
-                // if the bit is 1, pick the card at index from cardAvailable array
-                if((k&1) == 1){
-                    cardsToPick[count][index] = cardAvailable[index];
-                    count++;
-                }
-
-                // if count is equal to n, break the loop
-                if(count == n)
-                    break;
-
-                //increment index
-                index++;
-            }
-        }
-    }
     @Override
     protected void _setup(AbstractGameState firstState) {
         JaipurGameState gs = (JaipurGameState) firstState;
@@ -283,20 +282,124 @@ public class JaipurForwardModel extends StandardForwardModel {
 
         // Option A: Take several (non-camel) cards and replenish with cards of different types from hand (or with camels)
         // TODO (Advanced, bonus, optional): Calculate legal option A variations
-        /*
-        JaipurCard.GoodType cardAvailable[] = {null,null,null,null,null}; int counter =0;
+        int cardAvailable[] = {-1,-1,-1,-1,-1};//Size 5 = number of card in Market
+        int nCardAvailable =0;
+        //int nCardToTake =0;
+        //Find howMany cards per good type are available
         for(JaipurCard.GoodType gt: jgs.getMarket().keySet()) {
-            if(jgs.getMarket().get(gt).getValueIdx()>0&&gt!=JaipurCard.GoodType.Camel) {
-                for (int i =0;i<jgs.getMarket().get(gt).getValueIdx();i++){
-                    cardAvailable[counter] = gt;
-                    counter++;
+            int itemCounter = jgs.getMarket().get(gt).getValueIdx();
+            if(itemCounter>0&&gt!=JaipurCard.GoodType.Camel) {
+                for (int i =0;i<itemCounter;i++) {
+                    cardAvailable[nCardAvailable++] = gt.ordinal();
                 }
             }
         }
-        for(int nCardsToTake = 2;nCardsToTake<=5 && nCardsToTake<=7-nCardsInHand;nCardsToTake++){
-            JaipurCard.GoodType cardsToTake[][] = new JaipurCard.GoodType[(int)Math.pow(2,counter)][nCardsToTake];
-            pickCards(cardAvailable,cardsToTake,nCardsToTake);
-        }*/
+        int cardAvailableToGive[] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+        int nCardAvailableToGive =0;
+        for(JaipurCard.GoodType gt: jgs.getPlayerHands().get(currentPlayer).keySet()) {
+            int itemCounter = jgs.getPlayerHands().get(currentPlayer).get(gt).getValueIdx();
+            if(itemCounter>0) {
+                for (int i =0;i<itemCounter;i++) {
+                    cardAvailableToGive[nCardAvailableToGive++] = gt.ordinal();
+                }
+            }
+        }
+        for(int i=0;i<jgs.getPlayerHerds().get(currentPlayer).getValueIdx();i++){
+            cardAvailableToGive[nCardAvailableToGive++] = Camel.ordinal();
+        }
+
+        //For each combinations of cardToTake, then for each combinations of cardToGive, create action
+        for(int nCardToTake=2;nCardToTake<=nCardAvailable&&nCardToTake<=nCardAvailableToGive;nCardToTake++){//How many card to trade, 2 - 5
+            ArrayList<int[]> cardToTakeCom = Utils.generateCombinations(cardAvailable,nCardToTake);
+            HashSet<String> set = new HashSet<>(); // used to store the combination of elements
+            for (int i = 0; i < cardToTakeCom.size(); i++) {
+                int[] combination = cardToTakeCom.get(i);
+                // convert the combination to a string, so we can use it to compare with the elements in the set
+                String combinationString = Arrays.toString(combination);
+                boolean containsNegativeOne = false;
+                // check if the combination has -1
+                for (int j = 0; j < combination.length; j++) {
+                    if (combination[j] == -1) {
+                        containsNegativeOne = true;
+                    }
+                }
+                // check if the combination has already been added to the set
+                if (set.contains(combinationString) || containsNegativeOne) {
+                    // if it has, remove it from the result
+                    cardToTakeCom.remove(i);
+                } else {
+                    // if not, add it to the set
+                    set.add(combinationString);
+                }
+            }
+            ArrayList<int[]> cardToGiveCom = Utils.generateCombinations(cardAvailableToGive,nCardToTake);
+            HashSet<String> set1 = new HashSet<>(); // used to store the combination of elements
+            for (int i = 0; i < cardToGiveCom.size(); i++) {
+                int[] combination = cardToGiveCom.get(i);
+                // convert the combination to a string, so we can use it to compare with the elements in the set
+                String combinationString = Arrays.toString(combination);
+                boolean containsNegativeOne = false;
+                // check if the combination has -1
+                for (int j = 0; j < combination.length; j++) {
+                    if (combination[j] == -1) {
+                        containsNegativeOne = true;
+                    }
+                }
+                // check if the combination has already been added to the set
+                if (set1.contains(combinationString)||containsNegativeOne) {
+                    // if it has, remove it from the result
+                    cardToGiveCom.remove(i);
+                } else {
+                    // if not, add it to the set
+                    set1.add(combinationString);
+                }
+            }
+            //All dupicated combinations removed
+            //For each take combination, for each give combination create an action
+            for (int i = 0; i < cardToTakeCom.size(); i++) {
+                int[] takeCom = cardToTakeCom.get(i);
+                for(int j=0;j<cardToGiveCom.size();j++){
+                    boolean containsNegativeOne = false;
+                    int[] giveCom = cardToGiveCom.get(j);
+                    if (Arrays.stream(giveCom).anyMatch(x -> Arrays.stream(takeCom).anyMatch(y -> y == x))) {
+                        // check if the combination contains any element from the result array
+                        //ignore duplicated
+                    }else{
+                        ImmutableMap.Builder<JaipurCard.GoodType, Integer> builder = ImmutableMap.builder();
+                        int[] cardsCounter = {0,0,0,0,0,0,0};
+                        for (int a=0;a<takeCom.length;a++) {
+                            if(takeCom[a]<0){
+                                containsNegativeOne =true;
+                            }else{
+                                cardsCounter[takeCom[a]]+=1;
+                            }
+                        }
+                        for (int b=0;b<cardsCounter.length;b++){
+                            if(cardsCounter[b]>0)
+                            builder.put(intToGoodtype(b),cardsCounter[b]);
+                        }
+                        ImmutableMap.Builder<JaipurCard.GoodType, Integer> builder1 = ImmutableMap.builder();
+                        int[] cardsCounter1 = {0,0,0,0,0,0,0};
+                        for (int a=0;a<giveCom.length;a++) {
+                            if(giveCom[a]<0){
+                                containsNegativeOne =true;
+                            }else{
+                                cardsCounter1[giveCom[a]]+=1;
+                            }
+                        }
+                        for (int b=0;b<cardsCounter1.length;b++){
+                            if(cardsCounter1[b]>0)
+                            builder1.put(intToGoodtype(b),cardsCounter1[b]);
+                        }
+                        if(containsNegativeOne)
+                            continue;
+                        ImmutableMap<JaipurCard.GoodType, Integer> takeMap = builder.build();
+                        ImmutableMap<JaipurCard.GoodType, Integer> giveMap = builder1.build();
+                        actions.add(new TakeCards(takeMap,giveMap,currentPlayer));
+                    }
+                }
+            }
+        }
         return actions;
     }
     @Override

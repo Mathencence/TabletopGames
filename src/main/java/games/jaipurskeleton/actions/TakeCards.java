@@ -81,7 +81,6 @@ public class TakeCards extends AbstractAction {
                 return true;
             }
         }
-
         // Option A: Take several (non-camel) goods, replace the same number with cards from hand or camels
         for (JaipurCard.GoodType gt: howManyPerTypeTakeFromMarket.keySet()) {
             jgs.getPlayerHands().get(playerID).get(gt).increment(howManyPerTypeTakeFromMarket.get(gt));
