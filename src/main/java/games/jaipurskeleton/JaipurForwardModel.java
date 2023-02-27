@@ -103,7 +103,7 @@ public class JaipurForwardModel extends StandardForwardModel {
             gs.playerNBonusTokens.add(new Counter(0, 0, Integer.MAX_VALUE, "Player " + i + " n bonus tokens"));
 
             // Create herds, maximum 11 camels in the game
-            gs.playerHerds.add(new Counter(0, 0, 11, "Player " + i + " herd"));
+            gs.playerHerds.add(new Counter(0, 0, jp.nInitialCamel, "Player " + i + " herd"));
 
             Map<JaipurCard.GoodType, Counter> playerHand = new HashMap<>();
             for (JaipurCard.GoodType gt: JaipurCard.GoodType.values()) {
@@ -267,19 +267,20 @@ public class JaipurForwardModel extends StandardForwardModel {
         for (JaipurCard.GoodType gt: playerHand.keySet()) {
             nCardsInHand += playerHand.get(gt).getValue();
         }
-
         // Check hand limit for taking non-camel cards in hand
-        if (nCardsInHand < 7) {
-            // Option B: Take a single (non-camel) card from the market
-            // TODO 2: For each good type in the market, if there is at least 1 of that type (which is not a Camel), construct one TakeCards action object to take 1 of that type from the market, and add it to the `actions` ArrayList. (The `howManyPerTypeGiveFromHand` argument should be null)
-            for(JaipurCard.GoodType gt: jgs.getMarket().keySet()){
-                if(jgs.getMarket().get(gt).getValueIdx()>0&&gt!=JaipurCard.GoodType.Camel){
-                    ImmutableMap<JaipurCard.GoodType, Integer> itemMap = ImmutableMap.of(gt, 1);
-                    actions.add(new TakeCards(itemMap,null,currentPlayer));
-                }
+        if(nCardsInHand> 7)
+            return actions;
+        // Option B: Take a single (non-camel) card from the market
+        // TODO 2: For each good type in the market, if there is at least 1 of that type (which is not a Camel), construct one TakeCards action object to take 1 of that type from the market, and add it to the `actions` ArrayList. (The `howManyPerTypeGiveFromHand` argument should be null)
+        for(JaipurCard.GoodType gt: jgs.getMarket().keySet()){
+            if(jgs.getMarket().get(gt).getValueIdx()>0&&gt!=JaipurCard.GoodType.Camel){
+                ImmutableMap<JaipurCard.GoodType, Integer> itemMap = ImmutableMap.of(gt, 1);
+                actions.add(new TakeCards(itemMap,null,currentPlayer));
             }
         }
-
+        boolean bonusAction = true;
+        if(bonusAction == false)
+            return actions;
         // Option A: Take several (non-camel) cards and replenish with cards of different types from hand (or with camels)
         // TODO (Advanced, bonus, optional): Calculate legal option A variations
         int cardAvailable[] = {-1,-1,-1,-1,-1};//Size 5 = number of card in Market
@@ -305,6 +306,9 @@ public class JaipurForwardModel extends StandardForwardModel {
             }
         }
         for(int i=0;i<jgs.getPlayerHerds().get(currentPlayer).getValueIdx();i++){
+            //If giving camel would exceed handlimits
+            if(i>7-nCardsInHand-1)
+                break;
             cardAvailableToGive[nCardAvailableToGive++] = Camel.ordinal();
         }
 
@@ -339,7 +343,7 @@ public class JaipurForwardModel extends StandardForwardModel {
                 // convert the combination to a string, so we can use it to compare with the elements in the set
                 String combinationString = Arrays.toString(combination);
                 boolean containsNegativeOne = false;
-                // check if the combination has -1
+                // check if the combination has -1, if give camel more than handlimit also set to -1 to remove
                 for (int j = 0; j < combination.length; j++) {
                     if (combination[j] == -1) {
                         containsNegativeOne = true;

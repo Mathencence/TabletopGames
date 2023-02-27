@@ -14,8 +14,8 @@ import java.util.Objects;
 
 public class TakeCards extends AbstractAction {
 
-    final ImmutableMap<JaipurCard.GoodType, Integer> howManyPerTypeTakeFromMarket;
-    final ImmutableMap<JaipurCard.GoodType, Integer> howManyPerTypeGiveFromHand;
+    public final ImmutableMap<JaipurCard.GoodType, Integer> howManyPerTypeTakeFromMarket;
+    public final ImmutableMap<JaipurCard.GoodType, Integer> howManyPerTypeGiveFromHand;
     final int playerID;
 
     boolean triggerRoundEnd;
