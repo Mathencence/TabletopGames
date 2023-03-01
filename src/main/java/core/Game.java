@@ -922,12 +922,13 @@ public class Game {
         // 1. Set up the players for the game.
         ArrayList<AbstractPlayer> players = new ArrayList<>();
         players.add(new RandomPlayer());
+        players.add(new RandomPlayer());
 //        players.add(new MCTSPlayer());
 //        MCTSParams params1 = new MCTSParams();
 //        players.add(new MCTSPlayer(params1));
 //        players.add(new OSLAPlayer());
 //        players.add(new RMHCPlayer());
-        players.add(new HumanGUIPlayer(ac));
+//        players.add(new HumanGUIPlayer(ac));
 //        players.add(new HumanConsolePlayer());
 //        players.add(new FirstActionPlayer());
 
@@ -935,7 +936,7 @@ public class Game {
         String gameParams = null;
 
         // 3. Run!
-        runOne(GameType.valueOf(gameType), gameParams, players, seed, false, null, useGUI ? ac : null, turnPause);
+        runOne(GameType.valueOf(gameType), gameParams, players, seed, true, null, useGUI ? ac : null, turnPause);
 
         // 4. Run several games
 //        ArrayList<GameType> games = new ArrayList<>(Arrays.asList(GameType.values()));

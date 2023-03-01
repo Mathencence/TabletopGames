@@ -2,9 +2,12 @@ package games.jaipurskeleton;
 
 import core.AbstractGameState;
 import core.AbstractParameters;
+import core.Game;
 import evaluation.TunableParameters;
+import games.GameType;
 import games.jaipurskeleton.components.JaipurCard;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -19,7 +22,7 @@ import java.util.Objects;
  * <p>The class can optionally extend from {@link TunableParameters} instead, which allows to use
  * automatic game parameter optimisation tools in the framework.</p>
  */
-public class JaipurParameters extends AbstractParameters {
+public class JaipurParameters extends TunableParameters {
     Map<JaipurCard.GoodType, Integer> goodNCardsMinimumSell = new HashMap<JaipurCard.GoodType, Integer>() {{
         put(JaipurCard.GoodType.Diamonds, 2);
         put(JaipurCard.GoodType.Gold, 2);
@@ -57,6 +60,38 @@ public class JaipurParameters extends AbstractParameters {
     boolean usingCreativeRule = false;
     public JaipurParameters(long seed) {
         super(seed);
+        addTunableParameter("nPointsMostCamels", 5, Arrays.asList(0, 2, 5, 7, 10));
+        for (JaipurCard.GoodType gt : goodNCardsMinimumSell.keySet()) {
+            addTunableParameter(gt.name() + "minSell", goodNCardsMinimumSell.get(gt), Arrays.asList(1, 2, 3, 4, 5));
+        }
+        addTunableParameter("nGoodTokensEmptyRoundEnd", 3, Arrays.asList(1, 2, 3, 4, 5, 6));
+        addTunableParameter("nRoundsWinForGameWin", 2, Arrays.asList(1, 2, 3, 4, 5));
+        addTunableParameter("nInitialDiamond", 6, Arrays.asList(5, 6, 7, 8, 9, 10));
+        addTunableParameter("nInitialGold", 6, Arrays.asList(5, 6, 7, 8, 9, 10));
+        addTunableParameter("nInitialSilver", 6, Arrays.asList(5, 6, 7, 8, 9, 10));
+        addTunableParameter("nInitialCloth", 8, Arrays.asList(5, 6, 7, 8, 9, 10));
+        addTunableParameter("nInitialSpice", 8, Arrays.asList(5, 6, 7, 8, 9, 10));
+        addTunableParameter("nInitialLeather", 10, Arrays.asList(5, 6, 7, 8, 9, 10));
+        addTunableParameter("nInitialCamel", 11, Arrays.asList(5, 6, 7, 8, 9, 10, 11));
+        addTunableParameter("nInitialCamelInMarket", 3, Arrays.asList(1,2,3,4,5));
+        _reset();
+    }
+
+    @Override
+    public void _reset() {
+        nPointsMostCamels = (int)getParameterValue("nPointsMostCamels");
+        goodNCardsMinimumSell.replaceAll((gt,v)->(Integer)getParameterValue(gt.name() + "minSell"));
+        nGoodTokensEmptyRoundEnd = (int)getParameterValue("nGoodTokensEmptyRoundEnd");
+        nRoundsWinForGameWin = (int)getParameterValue("nRoundsWinForGameWin");
+        nInitialDiamond = (int)getParameterValue("nInitialDiamond");
+        nInitialGold = (int)getParameterValue("nInitialGold");
+        nInitialSilver = (int)getParameterValue("nInitialSilver");
+        nInitialCloth = (int)getParameterValue("nInitialCloth");
+        nInitialSpice = (int)getParameterValue("nInitialSpice");
+        nInitialLeather = (int)getParameterValue("nInitialLeather");
+
+        nInitialCamel = (int)getParameterValue("nInitialCamel");
+        nInitialCamelInMarket = (int)getParameterValue("nInitialCamelInMarket");
     }
 
     // Copy constructor
@@ -158,5 +193,29 @@ public class JaipurParameters extends AbstractParameters {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), goodNCardsMinimumSell, bonusTokensAvailable, goodTokensProgression, nPointsMostCamels, nGoodTokensEmptyRoundEnd, nRoundsWinForGameWin, nInitialDiamond, nInitialGold, nInitialSilver, nInitialCloth, nInitialSpice, nInitialLeather, nInitialCamel, nInitialCamelInMarket, usingCreativeRule);
+    }
+
+    @Override
+    public String toString() {
+        return "JaipurParameters{" +
+                "goodNCardsMinimumSell=" + goodNCardsMinimumSell +
+                ", nPointsMostCamels=" + nPointsMostCamels +
+                ", nGoodTokensEmptyRoundEnd=" + nGoodTokensEmptyRoundEnd +
+                ", nRoundsWinForGameWin=" + nRoundsWinForGameWin +
+                ", nInitialDiamond=" + nInitialDiamond +
+                ", nInitialGold=" + nInitialGold +
+                ", nInitialSilver=" + nInitialSilver +
+                ", nInitialCloth=" + nInitialCloth +
+                ", nInitialSpice=" + nInitialSpice +
+                ", nInitialLeather=" + nInitialLeather +
+                ", nInitialCamel=" + nInitialCamel +
+                ", nInitialCamelInMarket=" + nInitialCamelInMarket +
+                ", usingCreativeRule=" + usingCreativeRule +
+                '}';
+    }
+
+    @Override
+    public Object instantiate() {
+        return new Game(GameType.Jaipur, new JaipurForwardModel(), new JaipurGameState(this ,GameType.Jaipur.getMinPlayers())) ;
     }
 }
