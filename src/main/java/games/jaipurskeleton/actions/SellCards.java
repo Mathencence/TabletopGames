@@ -5,6 +5,7 @@ import core.actions.AbstractAction;
 import core.components.Component;
 import core.components.Deck;
 import games.jaipurskeleton.JaipurGameState;
+import games.jaipurskeleton.JaipurParameters;
 import games.jaipurskeleton.components.JaipurCard;
 import games.jaipurskeleton.components.JaipurToken;
 
@@ -44,10 +45,15 @@ public class SellCards extends AbstractAction {
     @Override
     public boolean execute(AbstractGameState gs) {
         JaipurGameState jgs = (JaipurGameState) gs;
+        JaipurParameters jp = (JaipurParameters) gs.getGameParameters();
+
         int currentPlayer = gs.getCurrentPlayer();
 
         // TODO: Follow lab 1 instructions (Section 3.1) to fill in this method here.
         jgs.getPlayerHands().get(currentPlayer).get(goodType).decrement(howMany);
+        //Creative rule: When selling same type of cards > 1, put one of the same type back to the deck and shuffle.
+        if(howMany>=2&&jp.getusingCreativeRule())
+            jgs.getDrawDeck().add(new JaipurCard(goodType), 1);
 
         Deck<JaipurToken> goodTokens = jgs.getGoodTokens().get(goodType) ;
         boolean empty = goodTokens.getSize() == 0; //If the goodTokens.size equals to 0, empty = true.

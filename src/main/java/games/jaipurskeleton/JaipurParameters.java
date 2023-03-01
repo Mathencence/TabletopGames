@@ -54,6 +54,7 @@ public class JaipurParameters extends AbstractParameters {
     int nInitialCamel=11;
     int nInitialCamelInMarket=3;
 
+    boolean usingCreativeRule = false;
     public JaipurParameters(long seed) {
         super(seed);
     }
@@ -81,6 +82,7 @@ public class JaipurParameters extends AbstractParameters {
         this.nInitialLeather = jaipurParameters.getnInitialLeather();
         this.nInitialCamel = jaipurParameters.getnInitialCamel();
         this.nInitialCamelInMarket = jaipurParameters.getnInitialCamelInMarket();
+        this.usingCreativeRule = jaipurParameters.getusingCreativeRule();
     }
 
     public Map<JaipurCard.GoodType, Integer> getGoodNCardsMinimumSell() {
@@ -127,6 +129,7 @@ public class JaipurParameters extends AbstractParameters {
         return nInitialCamelInMarket;
     }
 
+    public boolean getusingCreativeRule(){return usingCreativeRule;}
     public int getNPointsMostCamels() {
         return nPointsMostCamels;
     }
@@ -150,10 +153,10 @@ public class JaipurParameters extends AbstractParameters {
         if (!(o instanceof JaipurParameters)) return false;
         if (!super.equals(o)) return false;
         JaipurParameters that = (JaipurParameters) o;
-        return nPointsMostCamels == that.nPointsMostCamels && nGoodTokensEmptyRoundEnd == that.nGoodTokensEmptyRoundEnd && nRoundsWinForGameWin == that.nRoundsWinForGameWin && nInitialDiamond == that.nInitialDiamond && nInitialGold == that.nInitialGold && nInitialSilver == that.nInitialSilver && nInitialCloth == that.nInitialCloth && nInitialSpice == that.nInitialSpice && nInitialLeather == that.nInitialLeather && nInitialCamel == that.nInitialCamel && nInitialCamelInMarket == that.nInitialCamelInMarket && goodNCardsMinimumSell.equals(that.goodNCardsMinimumSell) && bonusTokensAvailable.equals(that.bonusTokensAvailable) && goodTokensProgression.equals(that.goodTokensProgression);
+        return nPointsMostCamels == that.nPointsMostCamels && nGoodTokensEmptyRoundEnd == that.nGoodTokensEmptyRoundEnd && nRoundsWinForGameWin == that.nRoundsWinForGameWin && nInitialDiamond == that.nInitialDiamond && nInitialGold == that.nInitialGold && nInitialSilver == that.nInitialSilver && nInitialCloth == that.nInitialCloth && nInitialSpice == that.nInitialSpice && nInitialLeather == that.nInitialLeather && nInitialCamel == that.nInitialCamel && nInitialCamelInMarket == that.nInitialCamelInMarket && usingCreativeRule==that.usingCreativeRule && goodNCardsMinimumSell.equals(that.goodNCardsMinimumSell) && bonusTokensAvailable.equals(that.bonusTokensAvailable) && goodTokensProgression.equals(that.goodTokensProgression);
     }
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), goodNCardsMinimumSell, bonusTokensAvailable, goodTokensProgression, nPointsMostCamels, nGoodTokensEmptyRoundEnd, nRoundsWinForGameWin, nInitialDiamond, nInitialGold, nInitialSilver, nInitialCloth, nInitialSpice, nInitialLeather, nInitialCamel, nInitialCamelInMarket);
+        return Objects.hash(super.hashCode(), goodNCardsMinimumSell, bonusTokensAvailable, goodTokensProgression, nPointsMostCamels, nGoodTokensEmptyRoundEnd, nRoundsWinForGameWin, nInitialDiamond, nInitialGold, nInitialSilver, nInitialCloth, nInitialSpice, nInitialLeather, nInitialCamel, nInitialCamelInMarket, usingCreativeRule);
     }
 }
